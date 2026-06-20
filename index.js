@@ -1,4 +1,4 @@
-const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
+const { MongoClient, ServerApiVersion } = require("mongodb");
 const express = require("express");
 const app = express();
 const cors = require("cors");
@@ -26,7 +26,29 @@ async function run() {
   try {
     await client.connect();
 
-    const database = client.db("fable_ebook_db");
+    const database = client.db("fable_ebook");
+    const ebookCollection = database.collection("ebooks");
+
+    //Get Ebooks
+    app.get("/api/ebooks", async (req, res) => {
+      const query = {};
+      if (req.query.writerEmail) {
+        query.writerEmail = req.query.writerEmail;
+      }
+      if (req.query.status) {
+        query.status = req.query.status;
+      }
+      const cursor = ebookCollection.find(query);
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+
+    // Add New Ebook
+    app.post("/api/ebooks", async (req, res) => {
+      const ebook = req.body;
+      const result = await ebookCollection.insertOne(ebook);
+      res.send(result);
+    });
 
     await client.db("admin").command({ ping: 1 });
     console.log("Fable MongoDB connected successfully!");
