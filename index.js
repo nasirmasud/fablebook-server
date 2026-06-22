@@ -1,4 +1,4 @@
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const express = require("express");
 const app = express();
 const cors = require("cors");
@@ -29,23 +29,33 @@ async function run() {
     const database = client.db("fable_ebook");
     const ebookCollection = database.collection("ebooks");
 
-    //Get Ebooks
+    //Get Ebooks------------------
     app.get("/api/ebooks", async (req, res) => {
       const query = {};
-      if (req.query.writerEmail) {
-        query.writerEmail = req.query.writerEmail;
-      }
-      if (req.query.status) {
-        query.status = req.query.status;
-      }
-      const cursor = ebookCollection.find(query);
+      if (req.query.writerEmail) query.writerEmail = req.query.writerEmail;
+      if (req.query.status) query.status = req.query.status;
+
+      // handle limit
+      const limit = parseInt(req.query.limit) || 0;
+
+      const cursor = ebookCollection.find(query).limit(limit);
       const result = await cursor.toArray();
       res.send(result);
     });
 
-    // Add New Ebook
+    app.get("/api/ebooks/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = {
+        _id: new ObjectId(id),
+      };
+      const result = await ebookCollection.findOne(query);
+      res.send(result);
+    });
+
+    // Add New Ebook------------------
     app.post("/api/ebooks", async (req, res) => {
-      const ebook = req.body;
+      const data = req.body;
+      const ebook = { ...data, createdAt: new Date() };
       const result = await ebookCollection.insertOne(ebook);
       res.send(result);
     });
