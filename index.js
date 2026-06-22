@@ -28,6 +28,7 @@ async function run() {
 
     const database = client.db("fable_ebook");
     const ebookCollection = database.collection("ebooks");
+    const bookSellCollection = database.collection("soldbooks");
 
     //Get Ebooks------------------
     app.get("/api/ebooks", async (req, res) => {
@@ -57,6 +58,30 @@ async function run() {
       const data = req.body;
       const ebook = { ...data, createdAt: new Date() };
       const result = await ebookCollection.insertOne(ebook);
+      res.send(result);
+    });
+
+    //Sold Books------------------
+    app.get("/api/soldbooks", async (req, res) => {
+      const query = {};
+      if (req.query.buyerId) {
+        query.buyerId = req.query.buyerId;
+      }
+      if (req.query.bookId) {
+        query.bookId = req.query.bookId;
+      }
+      const cursor = bookSellCollection.find(query);
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+
+    app.post("/api/soldbooks", async (req, res) => {
+      const soldBook = req.body;
+      const soldBooks = {
+        ...soldBook,
+        createdAt: new Date(),
+      };
+      const result = await bookSellCollection.insertOne(soldBooks);
       res.send(result);
     });
 
