@@ -29,6 +29,13 @@ async function run() {
     const database = client.db("fable_ebook");
     const ebookCollection = database.collection("ebooks");
     const bookSellCollection = database.collection("soldbooks");
+    const userCollection = database.collection("user");
+
+    //Get Users-----------------------
+    app.get("/api/users", async (req, res) => {
+      const result = await userCollection.find().toArray();
+      res.send(result);
+    });
 
     //Get Ebooks------------------
     app.get("/api/ebooks", async (req, res) => {
