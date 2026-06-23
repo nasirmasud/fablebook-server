@@ -166,6 +166,24 @@ async function run() {
       }
     });
 
+    app.delete("/api/bookmarks/:id", async (req, res) => {
+      try {
+        const { id } = req.params;
+        const query = ObjectId.isValid(id) ? { _id: new ObjectId(id) } : { id };
+
+        const result = await bookmarkCollection.deleteOne(query);
+
+        if (result.deletedCount === 0) {
+          return res.status(404).json({ message: "Bookmark not found" });
+        }
+
+        res.send(result);
+      } catch (error) {
+        console.error("Delete bookmark error:", error);
+        res.status(400).json({ message: "Failed to delete bookmark" });
+      }
+    });
+
     await client.db("admin").command({ ping: 1 });
     console.log("Fable MongoDB connected successfully!");
   } finally {
