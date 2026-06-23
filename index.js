@@ -130,6 +130,20 @@ async function run() {
     });
 
     //BookMarks-----------------
+    app.get("/api/bookmarks", async (req, res) => {
+      const query = {};
+      if (req.query.email) query.userEmail = req.query.email;
+      if (req.query.role) query.role = req.query.role;
+      if (req.query.bookId) query.bookId = req.query.bookId;
+
+      const result = await bookmarkCollection
+        .find(query)
+        .sort({ createdAt: -1 })
+        .toArray();
+
+      res.send(result);
+    });
+
     app.post("/api/bookmarks", async (req, res) => {
       try {
         const data = req.body;
