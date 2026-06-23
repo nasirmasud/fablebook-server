@@ -30,6 +30,7 @@ async function run() {
     const ebookCollection = database.collection("ebooks");
     const bookSellCollection = database.collection("soldbooks");
     const userCollection = database.collection("user");
+    const bookmarkCollection = database.collection("bookmarks");
 
     //Users-----------------------
     app.get("/api/users", async (req, res) => {
@@ -40,9 +41,7 @@ async function run() {
     app.delete("/api/users/:id", async (req, res) => {
       try {
         const { id } = req.params;
-        const query = ObjectId.isValid(id)
-          ? { _id: new ObjectId(id) }
-          : { id };
+        const query = ObjectId.isValid(id) ? { _id: new ObjectId(id) } : { id };
 
         const result = await userCollection.deleteOne(query);
 
@@ -128,6 +127,29 @@ async function run() {
       };
       const result = await bookSellCollection.insertOne(soldBooks);
       res.send(result);
+    });
+
+    //BookMarks-----------------
+    app.post("/api/bookmarks", async (req, res) => {
+      try {
+        const data = req.body;
+        const existing = await bookmarkCollection.findOne({
+          userEmail: data.userEmail,
+          bookId: data.bookId,
+          role: data.role,
+        });
+
+        if (existing) {
+          return res.status(409).json({ message: "Book already bookmarked" });
+        }
+
+        const bookmark = { ...data, createdAt: new Date() };
+        const result = await bookmarkCollection.insertOne(bookmark);
+        res.send({ ...bookmark, _id: result.insertedId });
+      } catch (error) {
+        console.error("Add bookmark error:", error);
+        res.status(400).json({ message: "Failed to add bookmark" });
+      }
     });
 
     await client.db("admin").command({ ping: 1 });
