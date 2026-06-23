@@ -38,9 +38,23 @@ async function run() {
     });
 
     app.delete("/api/users/:id", async (req, res) => {
-      const query = { _id: new ObjectId(req.params.id) };
-      const result = await userCollection.deleteOne(query);
-      res.send(result);
+      try {
+        const { id } = req.params;
+        const query = ObjectId.isValid(id)
+          ? { _id: new ObjectId(id) }
+          : { id };
+
+        const result = await userCollection.deleteOne(query);
+
+        if (result.deletedCount === 0) {
+          return res.status(404).json({ message: "User not found" });
+        }
+
+        res.send(result);
+      } catch (error) {
+        console.error("Delete user error:", error);
+        res.status(400).json({ message: "Failed to delete user" });
+      }
     });
 
     //Ebooks------------------
