@@ -31,21 +31,25 @@ async function run() {
     const bookSellCollection = database.collection("soldbooks");
     const userCollection = database.collection("user");
 
-    //Get Users-----------------------
+    //Users-----------------------
     app.get("/api/users", async (req, res) => {
       const result = await userCollection.find().toArray();
       res.send(result);
     });
 
-    //Get Ebooks------------------
+    app.delete("/api/users/:id", async (req, res) => {
+      const query = { _id: new ObjectId(req.params.id) };
+      const result = await userCollection.deleteOne(query);
+      res.send(result);
+    });
+
+    //Ebooks------------------
     app.get("/api/ebooks", async (req, res) => {
       const query = {};
       if (req.query.writerEmail) query.writerEmail = req.query.writerEmail;
       if (req.query.status) query.status = req.query.status;
-
       // handle limit
       const limit = parseInt(req.query.limit) || 0;
-
       const cursor = ebookCollection.find(query).limit(limit);
       const result = await cursor.toArray();
       res.send(result);
@@ -57,6 +61,12 @@ async function run() {
         _id: new ObjectId(id),
       };
       const result = await ebookCollection.findOne(query);
+      res.send(result);
+    });
+
+    app.delete("/api/ebooks/:id", async (req, res) => {
+      const query = { _id: new ObjectId(req.params.id) };
+      const result = await ebookCollection.deleteOne(query);
       res.send(result);
     });
 
