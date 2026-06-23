@@ -61,6 +61,20 @@ async function run() {
       res.send(result);
     });
 
+    //Update Status---------------------
+    app.patch("/api/ebooks/:id", async (req, res) => {
+      const id = req.params.id;
+      const updatedBook = req.body;
+      const query = { _id: new ObjectId(id) };
+      const updatedDoc = {
+        $set: {
+          status: updatedBook.status,
+        },
+      };
+      const result = await ebookCollection.updateOne(query, updatedDoc);
+      res.send(result);
+    });
+
     //Sold Books------------------
     app.get("/api/soldbooks", async (req, res) => {
       const query = {};
