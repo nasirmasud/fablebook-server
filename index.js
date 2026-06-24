@@ -61,9 +61,12 @@ async function run() {
       const query = {};
       if (req.query.writerEmail) query.writerEmail = req.query.writerEmail;
       if (req.query.status) query.status = req.query.status;
-      // handle limit
-      const limit = parseInt(req.query.limit) || 0;
-      const cursor = ebookCollection.find(query).limit(limit);
+
+      let cursor = ebookCollection.find(query);
+      if (req.query.limit) {
+        const limit = parseInt(req.query.limit, 10);
+        if (limit > 0) cursor = cursor.limit(limit);
+      }
       const result = await cursor.toArray();
       res.send(result);
     });
