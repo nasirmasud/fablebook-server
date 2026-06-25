@@ -114,6 +114,9 @@ async function run() {
       if (req.query.buyerId) {
         query.buyerId = req.query.buyerId;
       }
+      if (req.query.sellerId) {
+        query.sellerId = req.query.sellerId;
+      }
       if (req.query.bookId) {
         query.bookId = req.query.bookId;
       }
