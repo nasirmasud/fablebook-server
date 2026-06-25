@@ -57,7 +57,7 @@ async function run() {
     });
 
     //Ebooks------------------
-    app.patch("/api/ebooks/:id", logger, verifyToken, async (req, res) => {
+    app.patch("/api/ebooks/:id", async (req, res) => {
       const { id } = req.params;
       const updateData = req.body;
       try {
