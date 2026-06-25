@@ -57,15 +57,46 @@ async function run() {
     });
 
     //Ebooks------------------
-    app.patch("/api/ebooks/:id", async (req, res) => {
+    app.patch("/api/ebooks/:id", logger, verifyToken, async (req, res) => {
       const { id } = req.params;
-      const updatedBook = req.body;
-      const result = await ebookCollection.updateOne(
-        { _id: new ObjectId(id) },
-        { $set: updatedBook },
-      );
-      res.send(result);
+      const updateData = req.body;
+      try {
+        const result = await ebookCollection.updateOne(
+          { _id: new ObjectId(id) },
+          { $set: updateData },
+        );
+        if (result.matchedCount === 0) {
+          return res.status(404).send({ message: "Book not found" });
+        }
+        res.send(result);
+      } catch (error) {
+        res.status(500).send({ message: "Update failed", error });
+      }
     });
+
+    // app.patch("/api/ebooks/:id", async (req, res) => {
+    //   const { id } = req.params;
+    //   const updatedBook = req.body;
+    //   const result = await ebookCollection.updateOne(
+    //     { _id: new ObjectId(id) },
+    //     { $set: updatedBook },
+    //   );
+    //   res.send(result);
+    // });
+
+    //Update Status---------------------
+    // app.patch("/api/ebooks/:id", async (req, res) => {
+    //   const id = req.params.id;
+    //   const updatedBook = req.body;
+    //   const query = { _id: new ObjectId(id) };
+    //   const updatedDoc = {
+    //     $set: {
+    //       status: updatedBook.status,
+    //     },
+    //   };
+    //   const result = await ebookCollection.updateOne(query, updatedDoc);
+    //   res.send(result);
+    // });
 
     app.get("/api/ebooks", async (req, res) => {
       const query = {};
@@ -102,20 +133,6 @@ async function run() {
       const data = req.body;
       const ebook = { ...data, createdAt: new Date() };
       const result = await ebookCollection.insertOne(ebook);
-      res.send(result);
-    });
-
-    //Update Status---------------------
-    app.patch("/api/ebooks/:id", async (req, res) => {
-      const id = req.params.id;
-      const updatedBook = req.body;
-      const query = { _id: new ObjectId(id) };
-      const updatedDoc = {
-        $set: {
-          status: updatedBook.status,
-        },
-      };
-      const result = await ebookCollection.updateOne(query, updatedDoc);
       res.send(result);
     });
 
