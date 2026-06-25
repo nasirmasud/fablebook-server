@@ -71,6 +71,7 @@ async function run() {
       const query = {};
       if (req.query.writerEmail) query.writerEmail = req.query.writerEmail;
       if (req.query.status) query.status = req.query.status;
+      if (req.query.author) query.author = req.query.author;
 
       let cursor = ebookCollection.find(query);
       if (req.query.limit) {
