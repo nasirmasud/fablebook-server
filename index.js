@@ -57,6 +57,16 @@ async function run() {
     });
 
     //Ebooks------------------
+    app.patch("/api/ebooks/:id", async (req, res) => {
+      const { id } = req.params;
+      const updatedBook = req.body;
+      const result = await ebookCollection.updateOne(
+        { _id: new ObjectId(id) },
+        { $set: updatedBook },
+      );
+      res.send(result);
+    });
+
     app.get("/api/ebooks", async (req, res) => {
       const query = {};
       if (req.query.writerEmail) query.writerEmail = req.query.writerEmail;
